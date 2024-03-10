@@ -1,0 +1,33 @@
+---
+title: "2. Workflow Basics"
+output: html_document
+date: "2024-03-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd('/Users/danielstafford/Coding/Tutorials/R-For-Data-Science')
+getwd()
+```
+
+```{r}
+my_variable <- 10
+my_varıable # typo! shouod be my_variable
+
+library(tidyverse)
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+# option shift k for keyboard shortcuts 
+
+my_bar_plot <- ggplot(mpg, aes(x = class)) +
+  geom_bar()
+my_bar_plot
+my_scatter_plot <- ggplot(mpg, aes(x = cty, y = hwy)) +
+  geom_point()
+my_scatter_plot
+ggsave(filename = "mpg-plot.png", plot = my_bar_plot) # my bar plot is saved
+```
+
