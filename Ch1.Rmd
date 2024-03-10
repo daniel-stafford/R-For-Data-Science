@@ -6,6 +6,8 @@ date: "2024-03-10"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+setwd('/Users/danielstafford/Coding/Tutorials/R-For-Data-Science')
+getwd()
 ```
 
 ```{r libraries}
