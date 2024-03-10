@@ -11,7 +11,7 @@ getwd()
 ```
 
 ```{r libraries}
-if (!require('tidyverse')) install.packages('palmerpenguins')
+if (!require('tidyverse')) install.packages('tidyverse')
 if (!require('palmerpenguins')) install.packages('palmerpenguins')
 if (!require('ggthemes')) install.packages('ggthemes')
 

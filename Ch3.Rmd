@@ -1,0 +1,62 @@
+---
+title: "Ch3"
+output: html_document
+date: "2024-03-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd('/Users/danielstafford/Coding/Tutorials/R-For-Data-Science')
+getwd()
+```
+
+```{r}
+if (!require('nycflights13')) install.packages('nycflights13')
+
+library(nycflights13)
+library(tidyverse)
+
+#  Confclits with filter and lag. If you want to use the base version of these functions after loading dplyr, you’ll need to use their full names: stats::filter() and stats::lag().
+```
+
+```{r explore data}
+?flights
+flights
+View(flights)
+glimpse(flights) # <int> is short for integer, <dbl> is short for double (aka real numbers), <chr> for character (aka strings), and <dttm> for date-time.
+```
+
+```{r 3.1.3 dplyr basics}
+
+flights |>
+  filter(dest == "IAH") |> 
+  group_by(year, month, day) |> 
+  summarize(
+    arr_delay = mean(arr_delay, na.rm = TRUE)
+  )
+
+# find all flights that departed more than 120 minutes (two hours) late:
+flights |> 
+  filter(dep_delay > 120)
+
+
+# Flights that departed on January 1
+flights |> 
+  filter(month == 1 & day == 1)
+
+# Flights that departed in January or February
+flights |> 
+  filter(month == 1 | month == 2)
+
+# A shorter way to select flights that departed in January or February
+flights |> 
+  filter(month %in% c(1, 2))
+
+flights |>
+  filter(month %in% c(11,12))
+
+feb <- flights |>
+  filter(month == 2)
+feb
+```
+
