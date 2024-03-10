@@ -1,0 +1,121 @@
+---
+title: "1. Data Visualization"
+output: html_document
+date: "2024-03-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries}
+if (!require('tidyverse')) install.packages('palmerpenguins')
+if (!require('palmerpenguins')) install.packages('palmerpenguins')m
+if (!require('ggthemes')) install.packages('ggthemes')
+
+library(tidyverse)
+library(palmerpenguins)
+library(ggthemes)
+```
+
+```{r explore}
+penguins
+glimpse(penguins)
+View(penguins)
+?penguins
+```
+
+```{r basic plot}
+ggplot(
+  data = penguins, # data = optional
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) + # mapping = optional, inside first () so passed globally
+  geom_point(mapping = aes(color = species, shape = species)) + # define colors for just points
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Body mass and flipper length",
+    subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+    x = "Flipper length (mm)",
+    y = "Body mass (g)",
+    color = "Species",
+    shape = "Species",
+    caption = "Data come from the palmerpenguins package"
+  ) +
+  scale_color_colorblind()
+
+
+```
+
+
+```{r exercises}
+dim(penguins) # 344 rows, 8 columns
+
+?penguins # a number denoting bill depth (millimeters) <- thickness
+
+
+ggplot(data = penguins,
+       mapping = aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point() + # appearas positive
+  labs(title = "Bill length and bill depth",
+       x = "Bill length (mm)",
+       y = "Bill depth (mm)")
+
+ggplot(data = penguins, 
+  mapping = aes(x = bill_length_mm, y = species)
+ ) +
+  geom_point() +
+  labs(title = "Bill length and species",
+       x = "Bill length (mm)",
+       y = "Species")
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = bill_length_mm, y = species)
+ ) +
+  geom_boxplot() +
+    labs(title = "Bill length and species",
+       x = "Bill length (mm)",
+       y = "Species")
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = bill_length_mm, y = species)
+ ) +
+  geom_boxplot(na.rm = T) + # ignore missing values
+    labs(title = "Bill length and species",
+       x = "Bill length (mm)",
+       y = "Species")
+
+colSums(is.na(penguins)) # get missing values
+
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(mapping = aes(color = bill_depth_mm)) +
+  geom_smooth()
+
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g, color = island)
+) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) +
+  geom_point() +
+  geom_smooth()
+
+ggplot() +
+  geom_point(
+    data = penguins,
+    mapping = aes(x = flipper_length_mm, y = body_mass_g)
+  ) +
+  geom_smooth(
+    data = penguins,
+    mapping = aes(x = flipper_length_mm, y = body_mass_g)
+  )
+```
+
