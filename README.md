@@ -1,2 +1,2 @@
 # R-For-Data-Science
-Notes and Exercises from the 2nd Ed. R for Data Science
+Notes and Exercises from (R for Data Science, 2nd edition)[https://r4ds.hadley.nz/].
