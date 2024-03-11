@@ -27,7 +27,6 @@ glimpse(flights) # <int> is short for integer, <dbl> is short for double (aka re
 ```
 
 ```{r 3.1.3 dplyr basics}
-
 flights |>
   filter(dest == "IAH") |> 
   group_by(year, month, day) |> 
@@ -58,5 +57,74 @@ flights |>
 feb <- flights |>
   filter(month == 2)
 feb
+
+flights |> 
+  arrange(year, month, day, dep_delay, dep_time)
+
+flights |> 
+  arrange(desc(dep_delay))
+
+# 3.2.4 distinct() 
+flights |> 
+  distinct() # remove any duplicate rows
+
+# Find all unique origin and destination pairs
+flights |> 
+  distinct(origin, dest)
+
+# eep other columns when filtering for unique rows, you can use the .keep_all = TRUE option.
+flights |> 
+  distinct(origin, dest, .keep_all = TRUE)
+
+flights |>
+  count(origin, dest, sort = TRUE)
+
+flights |>
+  count(year, month, sort = TRUE)
+```
+
+
+```{r 3.2.5 Exercises}
+flights |>
+  filter(dep_delay >= 120)
+flights |>
+  filter(dest %in% c("IAH", "HOU")) 
+flights |>
+  filter(carrier %in% c("UA", "AA", "DL")) 
+flights |>
+  filter(month %in% c(6,7,8)) 
+flights |>
+  filter(arr_delay > 120 & dep_delay == 0)
+
+flights |>
+  arrange(desc(dep_delay))
+
+flights |>
+  arrange(dep_time) |>
+  view()
+
+flights |>
+  arrange(arr_time - dep_time) |>
+  relocate(dep_time, arr_time)
+
+flights |>
+  distinct(month, day) |>
+  arrange(month, day) |>
+  count() #  OR nrow()
+
+flights |>
+  arrange(desc(distance)) |>
+  relocate(distance, origin, dest) # JFK to HNL
+
+flights |>
+  arrange(distance) |>
+  relocate(distance, origin, dest) # EWR to PHL
+
+# Order does not matter
+```
+
+```{r 3.3 Columns}
+
+
 ```
 
