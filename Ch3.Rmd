@@ -125,6 +125,100 @@ flights |>
 
 ```{r 3.3 Columns}
 
+# mutate
+flights |> 
+  mutate(
+    gain = dep_delay - arr_delay,
+    speed = distance / air_time * 60
+  ) |>
+  relocate(gain, speed) 
 
+# add to left hand side after mutating
+# mutate
+flights |> 
+  mutate(
+    gain = dep_delay - arr_delay,
+    speed = distance / air_time * 60,
+    before = 1)  # equivalent to relocate gain, speed
+
+#add after day variable, . is a sign that .before is an argument to the mutate function, not a variable name
+flights |>
+  mutate(
+    gain = dep_delay - arr_delay,
+    speed = distance / air_time * 60,
+    .after = day
+  )
+
+# only keep affected variables
+df_delay_gain <- flights |> 
+  mutate(
+    gain = dep_delay - arr_delay,
+    hours = air_time / 60,
+    gain_per_hour = gain / hours,
+    .keep = "used"
+  )
+
+df_delay_gain
+
+# 3.3.2 select() 
+
+#selet columns by name
+flights |> 
+  select(year, month, day, carrier)
+
+# select all columns between variables
+flights |> 
+  select(flight:dest)
+
+# select all columns except variables
+flights |> 
+  select(!year:day) # Historically this operation was done with - instead of !, so you’re likely to see that in the wild. These two operators serve the same purpose but with subtle differences in behavior. We recommend using ! because it reads as “not” and combines well with & and |.
+
+# select all columns with characters
+flights |> 
+  select(where(is.character))
+
+# rename variables
+flights |> 
+  select(tail_num = tailnum) # new name on left, old on right
+
+# further oin relocation
+flights |> 
+  relocate(year:dep_time, .after = time_hour)
+flights |> 
+  relocate(starts_with("arr"), .before = dep_time) 
+
+
+```
+
+```{r 3.3.5 Exercises}
+
+flights |> 
+  select(dep_time, sched_dep_time, dep_delay) # dep_delay diff between dep_time and sched
+
+flights |> 
+  select(dep_time:dep_delay)
+
+flights |> 
+  select(starts_with("dep") | starts_with("arr"))
+
+flights |> 
+  select(month, month, month)
+
+variables <- c("year", "month", "day", "dep_delay", "arr_delay")
+
+flights |> 
+  select(any_of(variables))
+  
+flights |> 
+  select(contains("TIME")) # by default, case ignored
+
+flights |> 
+  rename(air_time_min = air_time) |> 
+  relocate(air_time_min, .before = 1)
+
+flights |> 
+  select(tailnum) |> 
+  arrange(arr_delay) # because tailnum was selected, so arr_delay was booted
 ```
 
