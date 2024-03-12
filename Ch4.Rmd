@@ -1,0 +1,19 @@
+---
+title: "Ch4"
+output: html_document
+date: "2024-03-12"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r 4.1 Names}
+# Strive for:
+short_flights <- flights |> filter(air_time < 60)
+
+# Avoid:
+SHORTFLIGHTS <- flights |> filter(air_time < 60)
+```
+
+

@@ -12,11 +12,14 @@ getwd()
 
 ```{r}
 if (!require('nycflights13')) install.packages('nycflights13')
+if (!require('Lahman')) install.packages('Lahman')
 
 library(nycflights13)
 library(tidyverse)
+library(dplyr)
+library(Lahman)
 
-#  Confclits with filter and lag. If you want to use the base version of these functions after loading dplyr, you’ll need to use their full names: stats::filter() and stats::lag().
+#  Conflicts with filter and lag. If you want to use the base version of these functions after loading dplyr, you’ll need to use their full names: stats::filter() and stats::lag().
 ```
 
 ```{r explore data}
@@ -369,20 +372,44 @@ df |>
   group_by(y) |>
   summarize(mean_x = mean(x))
 
+# group by all combinatoins of y z, so a K, a L, b K
 df |>
   group_by(y, z) |>
   summarize(mean_x = mean(x))
 
+# same\?
 df |>
   group_by(y, z) |>
-  summarize(mean_x = mean(x), .groups = "drop")
-
-  group_by(y, z) |>
-  summarize(mean_x = mean(x))
+  summarize(mean_x = mean(x), .groups = "drop") # result is not grouped
 
 df |>
   group_by(y, z) |>
-  mutate(mean_x = mean(x))
+  summarize(mean_x = mean(x)) # show y z and summary mnean_x
 
+df |>
+  group_by(y, z) |>
+  mutate(mean_x = mean(x)) # create new column plus all others 
+
+```
+
+```{r 3.6 Case study: aggregates and sample size}
+
+batters <- Lahman::Batting |> 
+  group_by(playerID) |> 
+  summarize(
+    performance = sum(H, na.rm = TRUE) / sum(AB, na.rm = TRUE),
+    n = sum(AB, na.rm = TRUE)
+  )
+batters
+
+
+batters |> 
+  filter(n > 100) |> 
+  ggplot(aes(x = n, y = performance)) +
+  geom_point(alpha = 1 / 10) + 
+  geom_smooth(se = FALSE)
+
+batters |> 
+  arrange(desc(performance))
 ```
 
