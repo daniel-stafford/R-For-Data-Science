@@ -10,10 +10,48 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r 4.1 Names}
 # Strive for:
-short_flights <- flights |> filter(air_time < 60)
+---
+title: "Ch4"
+output: html_document
+date: "2024-03-13"
+---
 
-# Avoid:
-SHORTFLIGHTS <- flights |> filter(air_time < 60)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(dplyr)
+library(nycflights13)
 ```
+
+```{r}
+flights %>%
+  filter(dest == "IAH") %>%
+  group_by(year, month, day) %>%
+  summarize(
+    n = n(),
+    delay = mean(arr_delay, na.rm = TRUE)
+  ) %>%
+  filter(n > 10)
+
+flights %>%
+  filter(
+    carrier == "UA",
+    dest %in% c("IAH", "HOU"),
+    sched_dep_time > 900,
+    sched_arr_time < 2000
+  ) %>%
+  group_by(flight) %>%
+  summarize(
+    delay = mean(arr_delay, na.rm = TRUE),
+    cancelled = sum(is.na(arr_delay)),
+    n = n()
+  ) %>%
+  filter(n > 10)
+
+```
+
+
+
 
 
