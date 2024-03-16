@@ -6,13 +6,15 @@ date: "2024-03-10"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-setwd('/Users/danielstafford/Coding/Tutorials/R-For-Data-Science')
 getwd()
+# clear environment, console
+rm(list = ls())
+cat("\014")
 ```
 
 ```{r}
 my_variable <- 10
-my_varıable # typo! shouod be my_variable
+my_variable # typo! shouod be my_variable
 
 library(tidyverse)
 

@@ -1,0 +1,1149 @@
+---
+title: "1. Data Visualization"
+output: html_document
+date: "2024-03-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+getwd()
+# clear environment, console
+rm(list = ls())
+cat("\014")
+usethis::use_blank_slate()
+```
+
+```{r libraries}
+if (!require("tidyverse")) install.packages("tidyverse")
+if (!require("palmerpenguins")) install.packages("palmerpenguins")
+if (!require("ggthemes")) install.packages("ggthemes")
+
+library(tidyverse)
+library(palmerpenguins)
+library(ggthemes)
+```
+
+```{r 1.2.3 Creating a ggplot}
+penguins
+glimpse(penguins)
+View(penguins)
+?penguins
+```
+
+```{r basic plot}
+ggplot(
+  data = penguins, # data = optional
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) + # mapping = optional, inside first () so passed globally
+  geom_point(mapping = aes(color = species, shape = species)) + # define colors for just points
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Body mass and flipper length",
+    subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+    x = "Flipper length (mm)",
+    y = "Body mass (g)",
+    color = "Species",
+    shape = "Species",
+    caption = "Data come from the palmerpenguins package"
+  ) +
+  scale_color_colorblind()
+```
+
+
+```{r exercises}
+dim(penguins) # 344 rows, 8 columns
+
+?penguins # a number denoting bill depth (millimeters) <- thickness
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = bill_length_mm, y = bill_depth_mm)
+) +
+  geom_point() + # appearas positive
+  labs(
+    title = "Bill length and bill depth",
+    x = "Bill length (mm)",
+    y = "Bill depth (mm)"
+  )
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = bill_length_mm, y = species)
+) +
+  geom_point() +
+  labs(
+    title = "Bill length and species",
+    x = "Bill length (mm)",
+    y = "Species"
+  )
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = bill_length_mm, y = species)
+) +
+  geom_boxplot() +
+  labs(
+    title = "Bill length and species",
+    x = "Bill length (mm)",
+    y = "Species"
+  )
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = bill_length_mm, y = species)
+) +
+  geom_boxplot(na.rm = T) + # ignore missing values
+  labs(
+    title = "Bill length and species",
+    x = "Bill length (mm)",
+    y = "Species"
+  )
+
+colSums(is.na(penguins)) # get missing values
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) +
+  geom_point(mapping = aes(color = bill_depth_mm)) +
+  geom_smooth()
+
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g, color = island)
+) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) +
+  geom_point() +
+  geom_smooth()
+
+ggplot() +
+  geom_point(
+    data = penguins,
+    mapping = aes(x = flipper_length_mm, y = body_mass_g)
+  ) +
+  geom_smooth(
+    data = penguins,
+    mapping = aes(x = flipper_length_mm, y = body_mass_g)
+  )
+```
+
+```{r 1.3 GGPlot Cells}
+# verbose
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) +
+  geom_point()
+
+# concise
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point()
+
+# future pipe
+penguins |>
+  ggplot(aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point()
+```
+
+```{r 1.4 Visualizing distributions}
+ggplot(penguins, aes(x = species)) +
+  geom_bar()
+
+# reorder bt frequency by change to factor
+ggplot(penguins, aes(x = fct_infreq(species))) +
+  geom_bar()
+
+# 1.4.2 A numerical variable
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 200)
+
+# play with bin width
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 20)
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 2000)
+
+# denskity plot
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_density()
+```
+
+```{r 1.4.3 Exercises}
+ggplot(penguins, aes(y = species)) + # horizatonal when y =
+  geom_bar()
+
+ggplot(penguins, aes(x = species)) +
+  geom_bar(color = "red") # outline red
+
+ggplot(penguins, aes(x = species)) +
+  geom_bar(fill = "red") # fill in red
+
+# binwidth width of each bar in terms of x units
+
+ggplot(diamonds, aes(x = carat)) +
+  geom_histogram(binwidth = 0.05)
+
+ggplot(diamonds, aes(x = carat)) +
+  geom_histogram(binwidth = 0.50)
+```
+
+```{r 1.5.1 Visualizing relationships}
+# boxplot
+ggplot(penguins, aes(x = species, y = body_mass_g)) +
+  geom_boxplot()
+
+# density plot, customized the thickness of the lines using the linewidth argument in order to make them stand out a bit more against the background.
+ggplot(penguins, aes(x = body_mass_g, color = species)) +
+  geom_density(linewidth = 0.75)
+
+# alpha aesthetic to add transparency to the filled density curves.
+ggplot(penguins, aes(x = body_mass_g, color = species, fill = species)) +
+  geom_density(alpha = 0.5)
+
+# 1.5.2 Two categorical variables
+
+# difficlut to interpet, different bar siaes
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar()
+
+#  relative frequency plot created by setting position = "fill" in the geom, is more useful for comparing species distributions across islands since it’s not affected by the unequal numbers of penguins across the islands
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "fill")
+
+# 1.5.3 Two numerical variables
+
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point()
+
+# 3 or more variables, butcluttered and difficult ot read
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = island))
+
+# solutoin1 facets!
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = species)) +
+  facet_wrap(~island) # seperate plots via island
+```
+
+```{r 1.5.3 exercises}
+mpg
+?mpg
+
+ggplot(
+  mpg,
+  aes(x = hwy, y = displ, size = cty)
+) +
+  geom_point()
+
+ggplot(
+  mpg,
+  aes(x = hwy, y = displ, size = cty, color = cty)
+) +
+  geom_point()
+
+ggplot(
+  mpg,
+  aes(x = hwy, y = displ, size = cty, color = cty, shape = drv)
+) +
+  geom_point()
+
+ggplot(
+  mpg,
+  aes(x = hwy, y = displ, size = cty, color = cty, shape = drv, linewidth = cty) # linewidth is ignored
+) +
+  geom_point()
+
+ggplot(penguins, aes(x = bill_depth_mm, y = bill_length_mm)) +
+  geom_point(aes(color = species)) +
+  facet_wrap(~species)
+
+ggplot(
+  data = penguins,
+  mapping = aes(
+    x = bill_length_mm, y = bill_depth_mm,
+    color = species, shape = species
+  )
+) +
+  geom_point() +
+  labs(color = "species") # lower case to match var name
+
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "fill") # differences between islands
+ggplot(penguins, aes(x = species, fill = island)) +
+  geom_bar(position = "fill") # differences between species
+```
+
+```{r 1.6 Saving your plots}
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point()
+ggsave(filename = "penguin-plot.svg")
+```
+
+
+```{r 1.6 exercise}
+ggplot(mpg, aes(x = class)) +
+  geom_bar()
+ggplot(mpg, aes(x = cty, y = hwy)) +
+  geom_point()
+ggsave("mpg-plot.pdf") # saves last run, remember to use f1 for help
+```
+
+```{r}
+my_variable <- 10
+my_variable # typo! shouod be my_variable
+
+library(tidyverse)
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+# option shift k for keyboard shortcuts
+
+my_bar_plot <- ggplot(mpg, aes(x = class)) +
+  geom_bar()
+my_bar_plot
+my_scatter_plot <- ggplot(mpg, aes(x = cty, y = hwy)) +
+  geom_point()
+my_scatter_plot
+ggsave(filename = "mpg-plot.png", plot = my_bar_plot) # my bar plot is saved
+```
+
+
+## Ch 3
+
+```{r}
+if (!require("nycflights13")) install.packages("nycflights13")
+if (!require("Lahman")) install.packages("Lahman")
+
+library(nycflights13)
+library(tidyverse)
+library(dplyr)
+library(Lahman)
+
+#  Conflicts with filter and lag. If you want to use the base version of these functions after loading dplyr, you’ll need to use their full names: stats::filter() and stats::lag().
+```
+
+```{r explore data}
+?flights
+flights
+View(flights)
+glimpse(flights) # <int> is short for integer, <dbl> is short for double (aka real numbers), <chr> for character (aka strings), and <dttm> for date-time.
+```
+
+```{r 3.1.3 dplyr basics}
+flights |>
+  filter(dest == "IAH") |>
+  group_by(year, month, day) |>
+  summarize(
+    arr_delay = mean(arr_delay, na.rm = TRUE)
+  )
+
+# find all flights that departed more than 120 minutes (two hours) late:
+flights |>
+  filter(dep_delay > 120)
+
+
+# Flights that departed on January 1
+flights |>
+  filter(month == 1 & day == 1)
+
+# Flights that departed in January or February
+flights |>
+  filter(month == 1 | month == 2)
+
+# A shorter way to select flights that departed in January or February
+flights |>
+  filter(month %in% c(1, 2))
+
+flights |>
+  filter(month %in% c(11, 12))
+
+feb <- flights |>
+  filter(month == 2)
+feb
+
+flights |>
+  arrange(year, month, day, dep_delay, dep_time)
+
+flights |>
+  arrange(desc(dep_delay))
+
+# 3.2.4 distinct()
+flights |>
+  distinct() # remove any duplicate rows
+
+# Find all unique origin and destination pairs
+flights |>
+  distinct(origin, dest)
+
+# eep other columns when filtering for unique rows, you can use the .keep_all = TRUE option.
+flights |>
+  distinct(origin, dest, .keep_all = TRUE)
+
+flights |>
+  count(origin, dest, sort = TRUE)
+
+flights |>
+  count(year, month, sort = TRUE)
+```
+
+
+```{r 3.2.5 Exercises}
+flights |>
+  filter(dep_delay >= 120)
+flights |>
+  filter(dest %in% c("IAH", "HOU"))
+flights |>
+  filter(carrier %in% c("UA", "AA", "DL"))
+flights |>
+  filter(month %in% c(6, 7, 8))
+flights |>
+  filter(arr_delay > 120 & dep_delay == 0)
+
+flights |>
+  arrange(desc(dep_delay))
+
+flights |>
+  arrange(dep_time) |>
+  view()
+
+flights |>
+  arrange(arr_time - dep_time) |>
+  relocate(dep_time, arr_time)
+
+flights |>
+  distinct(month, day) |>
+  arrange(month, day) |>
+  count() #  OR nrow()
+
+flights |>
+  arrange(desc(distance)) |>
+  relocate(distance, origin, dest) # JFK to HNL
+
+flights |>
+  arrange(distance) |>
+  relocate(distance, origin, dest) # EWR to PHL
+
+# Order does not matter
+```
+
+```{r 3.3 Columns}
+# mutate
+flights |>
+  mutate(
+    gain = dep_delay - arr_delay,
+    speed = distance / air_time * 60
+  ) |>
+  relocate(gain, speed)
+
+# add to left hand side after mutating
+# mutate
+flights |>
+  mutate(
+    gain = dep_delay - arr_delay,
+    speed = distance / air_time * 60,
+    before = 1
+  ) # equivalent to relocate gain, speed
+
+# add after day variable, . is a sign that .before is an argument to the mutate function, not a variable name
+flights |>
+  mutate(
+    gain = dep_delay - arr_delay,
+    speed = distance / air_time * 60,
+    .after = day
+  )
+
+# only keep affected variables
+df_delay_gain <- flights |>
+  mutate(
+    gain = dep_delay - arr_delay,
+    hours = air_time / 60,
+    gain_per_hour = gain / hours,
+    .keep = "used"
+  )
+
+df_delay_gain
+
+# 3.3.2 select()
+
+# selet columns by name
+flights |>
+  select(year, month, day, carrier)
+
+# select all columns between variables
+flights |>
+  select(flight:dest)
+
+# select all columns except variables
+flights |>
+  select(!year:day) # Historically this operation was done with - instead of !, so you’re likely to see that in the wild. These two operators serve the same purpose but with subtle differences in behavior. We recommend using ! because it reads as “not” and combines well with & and |.
+
+# select all columns with characters
+flights |>
+  select(where(is.character))
+
+# rename variables
+flights |>
+  select(tail_num = tailnum) # new name on left, old on right
+
+# further oin relocation
+flights |>
+  relocate(year:dep_time, .after = time_hour)
+flights |>
+  relocate(starts_with("arr"), .before = dep_time)
+```
+
+```{r 3.3.5 Exercises}
+flights |>
+  select(dep_time, sched_dep_time, dep_delay) # dep_delay diff between dep_time and sched
+
+flights |>
+  select(dep_time:dep_delay)
+
+flights |>
+  select(starts_with("dep") | starts_with("arr"))
+
+flights |>
+  select(month, month, month)
+
+variables <- c("year", "month", "day", "dep_delay", "arr_delay")
+
+flights |>
+  select(any_of(variables))
+
+flights |>
+  select(contains("TIME")) # by default, case ignored
+
+flights |>
+  rename(air_time_min = air_time) |>
+  relocate(air_time_min, .before = 1)
+
+flights |>
+  select(tailnum)
+# arrange(arr_delay) # because tailnum was selected, so arr_delay was booted
+```
+
+```{r 3.4  Pipe and Groups}
+flights |>
+  filter(dest == "IAH") |>
+  mutate(speed = distance / air_time * 60) |>
+  select(year:day, dep_time, carrier, flight, speed) |>
+  arrange(desc(speed))
+
+flights |>
+  group_by(month)
+
+# 3.5.2 summarize()
+flights |>
+  group_by(month) |>
+  summarize(
+    avg_delay = mean(dep_delay) # uh oh, missing data!
+  )
+
+flights |>
+  group_by(month) |>
+  summarize(
+    avg_delay = mean(dep_delay, na.rm = TRUE)
+  )
+
+flights |>
+  group_by(month) |>
+  summarize(
+    avg_delay = mean(dep_delay, na.rm = TRUE),
+    n = n() # number of rows in each group
+  )
+
+# 3.5.3 The slice_ functions
+
+# df |> slice_head(n = 1) takes the first row from each group.
+# df |> slice_tail(n = 1) takes the last row in each group.
+# df |> slice_min(x, n = 1) takes the row with the smallest value of column x.
+# df |> slice_max(x, n = 1) takes the row with the largest value of column x.
+# df |> slice_sample(n = 1) takes one random row.
+
+flights |>
+  group_by(dest) |>
+  slice_max(arr_delay, n = 1) |> # takes the row with the largest value of column arr_delay
+  relocate(dest) # Note that there are 105 destinations but we get 108 rows here. What’s up? slice_min() and slice_max() keep tied values so n = 1 means give us all rows with the highest value. If you want exactly one row per group you can set with_ties = FALSE.
+
+flights |>
+  group_by(dest) |>
+  slice_max(arr_delay, n = 1, with_ties = F) |> # no ties, only one row per group
+  relocate(dest)
+
+# This is similar to computing the max delay with summarize(), but you get the whole corresponding row (or rows if there’s a tie) instead of the single summary statistic.
+
+daily <- flights |>
+  group_by(year, month, day) # multiple group variables, each summary peels off the last group.
+daily
+
+daily_flights <- daily |>
+  summarize(n = n()) # explains how one group was peeled off (day), now only 2 left
+
+daily_flights <- daily |>
+  summarize(
+    n = n(),
+    .groups = "drop_last" # surpress warning about peeling offf groups
+  )
+
+# summarize ungrouped data
+daily |>
+  ungroup() |>
+  summarize( # only one row becuase ungrouped data is treated as one group
+    avg_delay = mean(dep_delay, na.rm = TRUE),
+    flights = n()
+  )
+
+# 3.5.6 .by
+
+flights |>
+  summarize(
+    delay = mean(dep_delay, na.rm = TRUE),
+    n = n(),
+    .by = month # new and experimental
+  )
+
+# group by multiple variables
+flights |>
+  summarize(
+    delay = mean(dep_delay, na.rm = TRUE),
+    n = n(),
+    .by = c(origin, dest) # .by works with all verbs and has the advantage that you don’t need to use the .groups argument to suppress the grouping message or ungroup() when you’re done.
+  )
+```
+
+```{r 3.5.7 Exercises}
+flights |>
+  group_by(carrier, dest) |>
+  summarize(n())
+
+flights |>
+  group_by(carrier) |>
+  summarize(
+    avg_dep_delay = mean(dep_delay, na.rm = T)
+  ) |>
+  arrange(desc(avg_dep_delay)) # F9 (Frontier Airlines) has the worst delays
+
+flights |>
+  group_by(dest) |>
+  slice_max(dep_delay, with_ties = F) |>
+  relocate(dest, dep_delay)
+
+df_dep_time <- flights |>
+  group_by(hour) |>
+  summarize(
+    avg_delay_time = mean(dep_delay, na.rm = T)
+  )
+
+ggplot(df_dep_time, aes(x = hour, y = avg_delay_time)) +
+  geom_smooth()
+
+# flights |>
+#   group_by(dest)
+#   slice_min(dep_delay, n = -1)
+
+flights |>
+  count(carrier, sort = T) # roughly equivalent to df %>% group_by(a, b) %>% summarise(n = n()). count()
+
+df <- tibble(
+  x = 1:5,
+  y = c("a", "b", "a", "a", "b"),
+  z = c("K", "K", "L", "L", "K")
+)
+
+df
+
+# a, a, a, a, b
+
+df |>
+  group_by(y) # groups by y , thought output remains the same
+
+# a, a, a, a, b
+
+df |>
+  arrange(y)
+
+# two rows, mean of all a's, mean of all b's, two columns
+
+df |>
+  group_by(y) |>
+  summarize(mean_x = mean(x))
+
+# group by all combinatoins of y z, so a K, a L, b K
+df |>
+  group_by(y, z) |>
+  summarize(mean_x = mean(x))
+
+# same\?
+df |>
+  group_by(y, z) |>
+  summarize(mean_x = mean(x), .groups = "drop") # result is not grouped
+
+df |>
+  group_by(y, z) |>
+  summarize(mean_x = mean(x)) # show y z and summary mnean_x
+
+df |>
+  group_by(y, z) |>
+  mutate(mean_x = mean(x)) # create new column plus all others
+```
+
+```{r 3.6 Case study: aggregates and sample size}
+batters <- Lahman::Batting |>
+  group_by(playerID) |>
+  summarize(
+    performance = sum(H, na.rm = TRUE) / sum(AB, na.rm = TRUE),
+    n = sum(AB, na.rm = TRUE)
+  )
+batters
+
+
+batters |>
+  filter(n > 100) |>
+  ggplot(aes(x = n, y = performance)) +
+  geom_point(alpha = 1 / 10) +
+  geom_smooth(se = FALSE)
+
+batters |>
+  arrange(desc(performance))
+```
+
+## Ch 4
+
+```{r libraries}
+library(nycflights13)
+```
+
+```{r}
+flights %>%
+  filter(dest == "IAH") %>%
+  group_by(year, month, day) %>%
+  summarize(
+    n = n(),
+    delay = mean(arr_delay, na.rm = TRUE)
+  ) %>%
+  filter(n > 10)
+
+flights %>%
+  filter(
+    carrier == "UA",
+    dest %in% c("IAH", "HOU"),
+    sched_dep_time > 900,
+    sched_arr_time < 2000
+  ) %>%
+  group_by(flight) %>%
+  summarize(
+    delay = mean(arr_delay, na.rm = TRUE),
+    cancelled = sum(is.na(arr_delay)),
+    n = n()
+  ) %>%
+  filter(n > 10)
+```
+
+## Ch 5
+
+```{r 5.2 }
+billboard
+
+billboard |>
+  pivot_longer(
+    cols = starts_with("wk"),
+    names_to = "week",
+    values_to = "rank"
+  )
+
+billboard |>
+  pivot_longer(
+    cols = starts_with("wk"),
+    names_to = "week",
+    values_to = "rank",
+    values_drop_na = TRUE
+  )
+
+billboard_longer <- billboard |>
+  pivot_longer(
+    cols = starts_with("wk"),
+    names_to = "week",
+    values_to = "rank",
+    values_drop_na = TRUE
+  ) |>
+  mutate(
+    week = parse_number(week)
+  )
+billboard_longer
+
+billboard_longer |>
+  ggplot(aes(x = week, y = rank, group = track)) +
+  geom_line(alpha = 0.25) +
+  scale_y_reverse()
+
+df <- tribble(
+  ~id, ~bp1, ~bp2,
+  "A", 100, 120,
+  "B", 140, 115,
+  "C", 120, 125
+)
+
+df |>
+  pivot_longer(
+    cols = bp1:bp2,
+    names_to = "measurement",
+    values_to = "value"
+  )
+
+who2
+?who2
+View(who2)
+
+who2 |>
+  pivot_longer(
+    cols = !(country:year),
+    names_to = c("diagnosis", "gender", "age"),
+    names_sep = "_",
+    values_to = "count"
+  )
+
+who2 |>
+  pivot_longer(
+    cols = !(country:year),
+    names_to = c("diagnosis", "gender", "age"),
+    names_sep = "_",
+    values_to = "count"
+  )
+```
+```{r 5.3 Legthening Data}
+df <- tribble(
+  ~id, ~bp1, ~bp2,
+  "A", 100, 120,
+  "B", 140, 115,
+  "C", 120, 125
+)
+
+df |> pivot_longer(
+  cols = bp1:bp2,
+  names_to = "measurement",
+  values_to = "amount"
+)
+```
+
+```{r data and variable names}
+household
+?household
+
+household |>
+  pivot_longer(
+    cols = !family,
+    names_to = c(".value", "child"),
+    names_sep = "_",
+    values_drop_na = T,
+    values_to = "name"
+  )
+```
+
+```{r 5.4 Widening data}
+View(cms_patient_experience)
+?cms_patient_care
+cms_patient_experience |>
+  distinct(measure_cd, measure_title)
+
+cms_patient_experience |>
+  pivot_wider(
+    id_cols = starts_with("org"),
+    names_from = measure_cd,
+    values_from = prf_rate
+  ) |>
+  View()
+```
+
+```{r 5.4.1 How pivot wider works}
+df <- tribble(
+  ~id, ~measurement, ~value,
+  "A",        "bp1",    100,
+  "B",        "bp1",    140,
+  "B",        "bp2",    115,
+  "A",        "bp2",    120,
+  "A",        "bp3",    105
+)
+
+df |> pivot_wider(
+  id_cols = "id", # optional in this case
+  names_from = measurement,
+  values_from = value,
+)
+
+df |>
+  distinct(measurement) |>
+  pull() # extra column
+
+df |>
+  select(-measurement, -value) |> # all but measurement, value
+  distinct() # A B
+
+df |>
+  select(-measurement, -value) |>
+  distinct() |>
+  mutate(x = NA, y = NA, z = NA)
+
+df <- tribble(
+  ~id, ~measurement, ~value,
+  "A",        "bp1",    100,
+  "A",        "bp1",    102,
+  "A",        "bp2",    120,
+  "B",        "bp1",    140,
+  "B",        "bp2",    115
+)
+
+df |>
+  summarise(
+    n = n(),
+    .by = c(id, measurement)
+  ) |>
+  filter(n > 1)
+
+df |>
+  # check to see if there are repeat combinations of ID and measurement and, if so, remove the repeat
+  distinct(id, measurement, .keep_all = TRUE) |>
+  pivot_wider(
+    id_cols = id,
+    names_from = measurement,
+    values_from = value
+  )
+```
+
+# Ch 6
+
+```{r 6.1 shortcuts}
+library(dplyr)
+library(nycflights13)
+
+not_cancelled <- flights |>
+  filter(!is.na(dep_delay), !is.na(arr_delay))
+
+not_cancelled |>
+  group_by(year, month, day) |>
+  summarize(mean = mean(dep_delay))
+```
+
+```{r 6.2.2 Where does your analysis live?}
+getwd()
+```
+
+```{r 6.2.4 Relative and absolute paths}
+# always use relative paths! 👀
+```
+
+```{r 6.3 exercises}
+# Edit a DF interactively!
+library(DataEditR)
+
+mtcars_new <- data_edit(mtcars,
+  save_as = "mtcars_new.csv"
+)
+
+library(ViewPipeSteps)
+diamonds
+# View pipe steps!
+diamonds %>%
+  select(carat, cut, color, clarity, price) %>%
+  group_by(color) %>%
+  summarise(n = n(), price = mean(price)) %>%
+  arrange(desc(color)) %>%
+  print_pipe_steps()
+```
+
+## Ch 7
+```{r 7.2 Reading data from a file}
+students <- read_csv("https://pos.it/r4ds-students-csv")
+glimpse(students)
+
+students <- read_csv("https://pos.it/r4ds-students-csv", na = c("N/A", "")) # capture both empty and N/A strings
+glimpse(students)
+
+# columns names annoying have backticks, remove them
+students <- rename(
+  students,
+  student_id = `Student ID`,
+  full_name = `Full Name`
+)
+glimpse(students)
+
+# alterntive automatic method
+library(janitor)
+students <- read_csv("https://pos.it/r4ds-students-csv", na = c("N/A", ""))
+glimpse(students)
+students |> janitor::clean_names()
+
+# change cats to factors, fix age
+students <- students |>
+  janitor::clean_names() |>
+  mutate(
+    meal_plan = factor(meal_plan), # changes from chr to fct
+    age = parse_number(if_else(age == "five", "5", age)) # if age is "five", turn to "5" otherwise leave it along, parse all age strings as numbers
+  )
+glimpse(students)
+```
+
+```{r 7.2.2 Other arguments}
+read_csv(
+  "a,b,c
+  1,2,3
+  4,5,6"
+)
+
+# skip first two rows of csv.
+read_csv(
+  "The first line of metadata
+  The second line of metadata
+  x,y,z
+  1,2,3",
+)
+
+read_csv(
+  "The first line of metadata
+  The second line of metadata
+  x,y,z
+  1,2,3",
+  skip = 2
+)
+
+# ignore specific lines
+read_csv(
+  "/ A comment I want to skip
+  x,y,z
+  1,2,3",
+  comment = "/"
+)
+
+# no col names
+read_csv(
+  "1,2,3
+  4,5,6",
+  col_names = FALSE # creates col names
+)
+
+# custom col names
+read_csv(
+  "1,2,3
+  4,5,6",
+  col_names = c("x", "y", "z")
+)
+```
+
+```{r 7.2.3 Other file types}
+# semicolon: csv2, tab: tsv, delim: guess, fwf: fixed width, tableL white space/fixed width, log: apache log
+```
+
+```{r 7.2.4 Exercises}
+# delim
+# na, trim_ws, etc.
+#  read_fwf() fwf_empty() - Guesses based on the positions of empty columns. fwf_widths() - Supply the widths of the columns. fwf_positions() - Supply paired vectors of start and end positions. fwf_cols() - Supply named arguments of paired start and end positions or column widths.
+
+read_csv("x,y\n1,'a,b'", quote = "'")
+
+read_csv("a,b,c\n1,2,3\n4,5,6") # was missing a column
+
+annoying <- tibble(
+  `1` = 1:10,
+  `2` = `1` * 2 + rnorm(length(`1`))
+)
+
+annoying
+
+getOne <- annoying |>
+  select("1")
+
+# Extracting the variable labeled as '1'
+annoying |>
+  pull(`1`)
+
+# scatterplot one vs. two
+annoying |>
+  ggplot(aes(x = `2`, y = `1`)) +
+  geom_point()
+
+# Creating a new column called 3, which is 2 divided by 1.
+annoying <- annoying |>
+  mutate(
+    `3` = `2` / `1`
+  )
+
+# Renaming the columns to one, two, and three
+annoying |>
+  rename("one" = `1`, "two" = `2`, "three" = `3`)
+```
+
+```{r 7.3 Controlling column types}
+
+read_csv("
+  logical,numeric,date,string
+  TRUE,1,2021-01-15,abc
+  false,4.5,2021-02-15,def
+  T,Inf,2021-02-16,ghi
+")
+
+another_csv <- "
+x,y,z
+1,2,3"
+
+read_csv(
+  another_csv, 
+  col_types = cols(.default = col_character())
+)
+
+sales_files <- c(
+  "https://pos.it/r4ds-01-sales",
+  "https://pos.it/r4ds-02-sales",
+  "https://pos.it/r4ds-03-sales"
+)
+read_csv(sales_files, id = "file") # id argument adds a new column called file to the resulting data frame that identifies the file the data come from.
+
+sales_files <- list.files("data", pattern = "sales\\.csv$", full.names = TRUE)
+sales_files
+```
+
+```{r 7.5 Writing to a file}
+students
+write_csv(students, "data/students-2.csv")
+read_csv("data/students-2.csv") # note that we lose col type for meal_plan
+
+# custom R's binary RDS
+write_rds(students, "students.rds")
+read_rds("students.rds")
+
+# arrow binary for many languages
+install.packages("arrow")
+library(arrow)
+students
+# write_parquet(students, "students.parquet")
+read_parquet("students.parquet")
+
+```
+
+```{r 7.6 Data entry}
+
+# by column which is a bit weird
+tibble(
+  x = c(1, 2, 5), 
+  y = c("h", "m", "g"),
+  z = c(0.08, 0.83, 0.60)
+)
+
+# by row which is easier
+tribble(
+  ~x, ~y, ~z,
+  1, "h", 0.08,
+  2, "m", 0.83,
+  5, "g", 0.60
+)
+
+```
+
+
