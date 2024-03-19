@@ -276,7 +276,7 @@ ggplot(penguins, aes(x = species, fill = island)) +
 ```{r 1.6 Saving your plots}
 ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
   geom_point()
-ggsave(filename = "Plots/penguin-plot.svg")
+ggsave(filename = "plots/penguin-plot.svg")
 ```
 
 
@@ -285,7 +285,7 @@ ggplot(mpg, aes(x = class)) +
   geom_bar()
 ggplot(mpg, aes(x = cty, y = hwy)) +
   geom_point()
-ggsave("Plots/mpg-plot.pdf") # saves last run, remember to use f1 for help
+ggsave("plots/mpg-plot.pdf") # saves last run, remember to use f1 for help
 ```
 
 ```{r}
@@ -306,7 +306,7 @@ my_bar_plot
 my_scatter_plot <- ggplot(mpg, aes(x = cty, y = hwy)) +
   geom_point()
 my_scatter_plot
-ggsave(filename = "Plots/mpg-plot.png", plot = my_bar_plot) # my bar plot is saved
+ggsave(filename = "plots/mpg-plot.png", plot = my_bar_plot) # my bar plot is saved
 ```
 
 
@@ -1101,8 +1101,8 @@ write_csv(students, "data/students-2.csv")
 read_csv("data/students-2.csv") # note that we lose col type for meal_plan
 
 # custom R's binary RDS
-write_rds(students, "students.rds")
-read_rds("students.rds")
+write_rds(students, "data/students.rds")
+read_rds("data/students.rds")
 
 # arrow binary for many languages
 library(arrow)
@@ -1714,8 +1714,8 @@ nycflights13::flights |>
   mutate(
     cancelled = is.na(dep_time)) |> 
   ggplot(aes(x = sched_dep_time)) + 
-  geom_freqpoly(aes(color = cancelled), binwidth = 5) +
-  facet_wrap(~cancelled, scales = "free_y")
+  geom_freqpoly(aes(color = cancelled), binwidth = 1/4) +
+  facet_wrap(~cancelled, scales = "free_y") # zoom in on y range
 ```
 
 
