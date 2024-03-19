@@ -11,12 +11,6 @@ getwd()
 rm(list = ls())
 cat("\014")
 usethis::use_blank_slate()
-```
-
-```{r libraries}
-if (!require("tidyverse")) install.packages("tidyverse")
-if (!require("palmerpenguins")) install.packages("palmerpenguins")
-if (!require("ggthemes")) install.packages("ggthemes")
 
 library(tidyverse)
 library(palmerpenguins)
@@ -26,7 +20,6 @@ library(ggthemes)
 ```{r 1.2.3 Creating a ggplot}
 penguins
 glimpse(penguins)
-View(penguins)
 ?penguins
 ```
 
@@ -283,7 +276,7 @@ ggplot(penguins, aes(x = species, fill = island)) +
 ```{r 1.6 Saving your plots}
 ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
   geom_point()
-ggsave(filename = "penguin-plot.svg")
+ggsave(filename = "Plots/penguin-plot.svg")
 ```
 
 
@@ -292,7 +285,7 @@ ggplot(mpg, aes(x = class)) +
   geom_bar()
 ggplot(mpg, aes(x = cty, y = hwy)) +
   geom_point()
-ggsave("mpg-plot.pdf") # saves last run, remember to use f1 for help
+ggsave("Plots/mpg-plot.pdf") # saves last run, remember to use f1 for help
 ```
 
 ```{r}
@@ -313,7 +306,7 @@ my_bar_plot
 my_scatter_plot <- ggplot(mpg, aes(x = cty, y = hwy)) +
   geom_point()
 my_scatter_plot
-ggsave(filename = "mpg-plot.png", plot = my_bar_plot) # my bar plot is saved
+ggsave(filename = "Plots/mpg-plot.png", plot = my_bar_plot) # my bar plot is saved
 ```
 
 
@@ -334,7 +327,6 @@ library(Lahman)
 ```{r explore data}
 ?flights
 flights
-View(flights)
 glimpse(flights) # <int> is short for integer, <dbl> is short for double (aka real numbers), <chr> for character (aka strings), and <dttm> for date-time.
 ```
 
@@ -412,8 +404,7 @@ flights |>
   arrange(desc(dep_delay))
 
 flights |>
-  arrange(dep_time) |>
-  view()
+  arrange(dep_time)
 
 flights |>
   arrange(arr_time - dep_time) |>
@@ -799,9 +790,7 @@ df |>
     values_to = "value"
   )
 
-who2
 ?who2
-View(who2)
 
 who2 |>
   pivot_longer(
@@ -849,8 +838,6 @@ household |>
 ```
 
 ```{r 5.4 Widening data}
-View(cms_patient_experience)
-?cms_patient_care
 cms_patient_experience |>
   distinct(measure_cd, measure_title)
 
@@ -859,8 +846,8 @@ cms_patient_experience |>
     id_cols = starts_with("org"),
     names_from = measure_cd,
     values_from = prf_rate
-  ) |>
-  View()
+  )
+cms_patient_experience
 ```
 
 ```{r 5.4.1 How pivot wider works}
@@ -944,19 +931,19 @@ getwd()
 # Edit a DF interactively!
 library(DataEditR)
 
-mtcars_new <- data_edit(mtcars,
-  save_as = "mtcars_new.csv"
-)
+# mtcars_new <- data_edit(mtcars,
+#   save_as = "mtcars_new.csv"
+# )
 
 library(ViewPipeSteps)
 diamonds
 # View pipe steps!
-diamonds %>%
-  select(carat, cut, color, clarity, price) %>%
-  group_by(color) %>%
-  summarise(n = n(), price = mean(price)) %>%
-  arrange(desc(color)) %>%
-  print_pipe_steps()
+# diamonds %>%
+#   select(carat, cut, color, clarity, price) %>%
+#   group_by(color) %>%
+#   summarise(n = n(), price = mean(price)) %>%
+#   arrange(desc(color)) %>%
+#   print_pipe_steps()
 ```
 
 ## Ch 7
@@ -1118,11 +1105,10 @@ write_rds(students, "students.rds")
 read_rds("students.rds")
 
 # arrow binary for many languages
-install.packages("arrow")
 library(arrow)
 students
 # write_parquet(students, "students.parquet")
-read_parquet("students.parquet")
+# read_parquet("students.parquet")
 ```
 
 ```{r 7.6 Data entry}
@@ -1323,8 +1309,7 @@ ggplot(mpg) +
 # certain combination do not exsist, for instance , there are no rear wheel drive train with 1 cylinder
 
 mpg %>%
-  filter(drv == "r" & cyl == 4) %>%
-  n()
+  filter(drv == "r" & cyl == 4)
 
 
 # What plots does the following code make? What does . do?
@@ -1369,11 +1354,11 @@ ggplot(mpg, aes(x = displ)) +
 
 ggplot(mpg) +
   geom_point(aes(x = displ, y = hwy)) +
-  facet_grid(drv ~ .) # rows
+  facet_grid(drv ~ .)
 
 ggplot(mpg) +
   geom_point(aes(x = displ, y = hwy)) +
-  facet_wrap(~drv, switch = y) # columns, use switch = y to make rows
+  facet_grid(drv ~ ., switch = "y") # move label to otherside
 ```
 
 ```{r 9.5 Statistical transformations}
@@ -1418,10 +1403,10 @@ diamonds |>
 
 # geom_col represents values in the data, why geom_bar uses counts
 
-ggplot(diamonds, aes(x = cut)) + 
+ggplot(diamonds, aes(x = cut)) +
   geom_bar()
 
-ggplot(diamonds, aes(x = cut, y=depth)) + 
+ggplot(diamonds, aes(x = cut, y = depth)) +
   geom_col()
 # Most geoms and stats come in pairs that are almost always used in concert. Make a list of all the pairs. What do they have in common? (Hint: Read through the documentation.)
 
@@ -1453,66 +1438,64 @@ ggplot(diamonds, aes(x = cut, y=depth)) +
 
 # In the first pair of plots, we see that setting group = 1 results in the marginal proportions of cuts being plotted. In the second pair of plots, setting group = color results in the proportions of colors within each cut being plotted.
 # one variable
-ggplot(diamonds, aes(x = cut, y = after_stat(prop))) + 
+ggplot(diamonds, aes(x = cut, y = after_stat(prop))) +
   geom_bar()
-ggplot(diamonds, aes(x = cut, y = after_stat(prop), group = 1)) + 
+ggplot(diamonds, aes(x = cut, y = after_stat(prop), group = 1)) +
   geom_bar() # after_stat(prop) represents the proportion of each category. The group = 1 argument is used to ensure the proportion are grouped
 
 # two variables
-ggplot(diamonds, aes(x = cut, fill = color, y = after_stat(prop))) + 
+ggplot(diamonds, aes(x = cut, fill = color, y = after_stat(prop))) +
   geom_bar()
-ggplot(diamonds, aes(x = cut, fill = color, y = after_stat(prop), group = color)) + 
+ggplot(diamonds, aes(x = cut, fill = color, y = after_stat(prop), group = color)) +
   geom_bar()
 ```
 
 ```{r 9.6 Position adjustments}
-
 # Color
-ggplot(mpg, aes(x = drv, color = drv)) + 
+ggplot(mpg, aes(x = drv, color = drv)) +
   geom_bar()
 
 # Fill
-ggplot(mpg, aes(x = drv, fill = drv)) + 
+ggplot(mpg, aes(x = drv, fill = drv)) +
   geom_bar()
 
-# fill with another class other than x 
-ggplot(mpg, aes(x = drv, fill = class)) + 
+# fill with another class other than x
+ggplot(mpg, aes(x = drv, fill = class)) +
   geom_bar()
 
 # identity
-ggplot(mpg, aes(x = drv, fill = class)) + 
-  geom_bar(alpha = 1/5, position = "identity") # create overlap, so use alpha for transparency, The identity position adjustment is more useful for 2d geoms, like points, where it is the default.
+ggplot(mpg, aes(x = drv, fill = class)) +
+  geom_bar(alpha = 1 / 5, position = "identity") # create overlap, so use alpha for transparency, The identity position adjustment is more useful for 2d geoms, like points, where it is the default.
 
 # transparent
-ggplot(mpg, aes(x = drv, color = class)) + 
-  geom_bar(fill = NA, position = "identity") #completely transparent by setting fill = NA.
+ggplot(mpg, aes(x = drv, color = class)) +
+  geom_bar(fill = NA, position = "identity") # completely transparent by setting fill = NA.
 
 # fill
-ggplot(mpg, aes(x = drv, fill = class)) + 
+ggplot(mpg, aes(x = drv, fill = class)) +
   geom_bar(position = "fill") # "fill" works like stacking, but makes each set of stacked bars the same height. This makes it easier to compare proportions across groups.
 
 # dodge
-ggplot(mpg, aes(x = drv, fill = class)) + 
+ggplot(mpg, aes(x = drv, fill = class)) +
   geom_bar(position = "dodge") # "dodge" places overlapping objects directly beside one another. This makes it easier to compare individual values.
 
 # fixing overplotting (one plot containg many values)
-ggplot(mpg, aes(x = displ, y = hwy)) + 
+ggplot(mpg, aes(x = displ, y = hwy)) +
   geom_point(position = "jitter") # adds a small amount of random noise to each point. This spreads the points out because no two points are likely to receive the same amount of random noise.
 
 # shorthand for jitter
-ggplot(mpg, aes(x = displ, y = hwy)) + 
+ggplot(mpg, aes(x = displ, y = hwy)) +
   geom_jitter()
 ```
 
 ```{r 9.6.1 Exercises}
-
 # What is the problem with the following plot? How could you improve it?
 
-ggplot(mpg, aes(x = cty, y = hwy)) + 
+ggplot(mpg, aes(x = cty, y = hwy)) +
   geom_point()
 
 # jitter it to avoid overplotting
-ggplot(mpg, aes(x = cty, y = hwy)) + 
+ggplot(mpg, aes(x = cty, y = hwy)) +
   geom_jitter()
 
 # What, if anything, is the difference between the two plots? Why?
@@ -1526,7 +1509,7 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
 # What parameters to geom_jitter() control the amount of jittering?
 ?geom_jitter # width, height, defaults to .4. this means the jitter values will occupy 80% (twice value of .4) of the implied bins. Categorical data is aligned on the integers, so a width or height of 0.5 will spread the data so it's not possible to see the distinction between the categories.
 
-ggplot(mpg, aes(x = cty, y = hwy)) + 
+ggplot(mpg, aes(x = cty, y = hwy)) +
   geom_jitter(width = .8, height = .8)
 
 ggplot(mpg, aes(x = displ, y = hwy)) +
@@ -1545,30 +1528,31 @@ ggplot(mpg, aes(x = cty, y = displ)) +
 ```
 
 ```{r 9.7 Coordinate systems}
+nz <- map_data("nz")
 
 ggplot(nz, aes(x = long, y = lat, group = group)) +
   geom_polygon(fill = "white", color = "black")
 
 ggplot(nz, aes(x = long, y = lat, group = group)) +
   geom_polygon(fill = "white", color = "black") +
-  coord_quickmap() # sets the aspect ratio correctly for geographic maps. 
+  coord_quickmap() # sets the aspect ratio correctly for geographic maps.
 
-bar <- ggplot(data = diamonds) + 
+bar <- ggplot(data = diamonds) +
   geom_bar(
-    mapping = aes(x = clarity, fill = clarity), 
+    mapping = aes(x = clarity, fill = clarity),
     show.legend = FALSE,
     width = 1
-  ) + 
+  ) +
   theme(aspect.ratio = 1)
 
-bar 
+bar
 bar + coord_flip() # flipped
 bar + coord_polar() # bar/Coxcomb
 ```
 
 ```{r}
 # Turn a stacked bar chart into a pie chart using coord_polar().
-mpg |> ggplot(aes(x="", fill=class)) + # stacked bar
+mpg |> ggplot(aes(x = "", fill = class)) + # stacked bar
   geom_bar() +
   coord_polar(theta = "y") # pie chart, theta ariable to map angle to (x or y), default = x
 
@@ -1578,19 +1562,161 @@ mpg |> ggplot(aes(x="", fill=class)) + # stacked bar
 # What does the following plot tell you about the relationship between city and highway mpg? Why is coord_fixed() important? What does geom_abline() do?
 
 ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
-  geom_point() + 
+  geom_point() +
   geom_abline() + # diagonal reference line where highway = city mileage, shows hwy mileage always higher than city
-  coord_fixed() # 1 unit on y axis is same length as 1 unit on x axis, 
+  coord_fixed() # 1 unit on y axis is same length as 1 unit on x axis,
 ```
 
 ```{r 9.8 The layered grammar of graphics}
-# ggplot(data = <DATA>) + 
+# ggplot(data = <DATA>) +
 #   <GEOM_FUNCTION>(
 #      mapping = aes(<MAPPINGS>),
-#      stat = <STAT>, 
+#      stat = <STAT>,
 #      position = <POSITION>
 #   ) +
 #   <COORDINATE_FUNCTION> +
 #   <FACET_FUNCTION>
 ```
+
+## Ch. 10: Exploratory data analysis
+
+```{r 10.3 variations}
+ggplot(diamonds, aes(x = carat)) +
+  geom_histogram(binwidth = 0.5)
+
+smaller <- diamonds |>
+  filter(carat < 3)
+
+ggplot(smaller, aes(x = carat)) +
+  geom_histogram(binwidth = 0.01)
+
+glimpse(smaller)
+
+ggplot(diamonds, aes(x = y)) +
+  geom_histogram(binwidth = 0.5)
+
+ggplot(diamonds, aes(x = y)) +
+  geom_histogram(binwidth = 0.5) +
+  coord_cartesian(ylim = c(0, 50)) #  zoom to small values of the y-axis with coord_cartesian(): coord_cartesian() also has an xlim() argument for when you need to zoom into the x-axis. ggplot2 also has xlim() and ylim() functions that work slightly differently: they throw away the data outside the limits.
+
+unusual <- diamonds |>
+  filter(y < 3 | y > 20) |>
+  select(price, x, y, z) |>
+  arrange(y)
+unusual
+```
+
+```{r 10.3.3 Exercises}
+# Explore the distribution of each of the x, y, and z variables in diamonds. What do you learn? Think about a diamond and how you might decide which dimension is the length, width, and depth.
+
+ggplot(diamonds, aes(x = x)) +
+  geom_histogram(binwidxth = 0.5)
+ggplot(diamonds, aes(x = y)) +
+  geom_histogram(binwidth = 0.5)
+ggplot(diamonds, aes(x = z)) +
+  geom_histogram(binwidth = 0.5)
+
+summary(diamonds$x) # 10.7
+summary(diamonds$y) # 58.9
+summary(diamonds$z) # 31
+
+# Appears to relate to vertical orientation
+
+# Explore the distribution of price. Do you discover anything unusual or surprising? (Hint: Carefully think about the binwidth and make sure you try a wide range of values.)
+
+ggplot(diamonds, aes(x = price, fill = cut)) +
+  geom_histogram(binwidth = 3)
+
+
+# How many diamonds are 0.99 carat? How many are 1 carat? What do you think is the cause of the difference?
+
+diamonds |>
+  filter(carat == 0.99) |>
+  count() # 23
+diamonds |>
+  filter(carat == 1) |>
+  count() # 1538
+
+# Compare and contrast coord_cartesian() vs. xlim() or ylim() when zooming in on a histogram. What happens if you leave binwidth unset? What happens if you try and zoom so only half a bar shows?
+
+ggplot(diamonds, aes(x = price, fill = cut)) +
+  geom_histogram(binwidth = 3,)
+
+ggplot(diamonds, aes(x = price, fill = cut)) +
+  geom_histogram(binwidth = 3) +
+  xlim(0, 10000) +
+  ylim(0, 100) # no plotting  beyond limits
+
+ggplot(diamonds, aes(x = price, fill = cut)) +
+  geom_histogram(binwidth = 3) +
+  coord_cartesian(xlim = c(0, 10000), ylim = c(0, 100)) # still plots data beyond limits
+```
+
+```{r 10.4 Unusual values}
+# drop the row with strange values, not recommended
+diamonds2 <- diamonds |> 
+  filter(between(y, 3, 20))
+
+# better to replace with missing values
+diamonds2 <- diamonds |> 
+  mutate(y = if_else(y < 3 | y > 20, NA, y))
+
+# ggoplot will warn they've been removed
+ggplot(diamonds2, aes(x = x, y = y)) + 
+  geom_point()
+
+# to supress the warning
+ggplot(diamonds2, aes(x = x, y = y)) + 
+  geom_point(na.rm = TRUE)
+
+nycflights13::flights |> 
+  mutate(
+    cancelled = is.na(dep_time), #NA = flight canceled, so plot!
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + (sched_min / 60)
+  ) |> 
+  ggplot(aes(x = sched_dep_time)) + 
+  geom_freqpoly(aes(color = cancelled), binwidth = 1/4)
+# However this plot isn’t great because there are many more non-cancelled flights than cancelled flights. 
+```
+
+```{r 10.4.1 Exercises}
+
+# What happens to missing values in a histogram? What happens to missing values in a bar chart? Why is there a difference in how missing values are handled in histograms and bar charts?
+
+diamonds2 |>  ggplot(aes(x=y)) +
+  geom_boxplot() # missing values ignored
+
+diamonds2 |>  ggplot(aes(x=y)) +
+  geom_bar() # appears to allow ignore?
+
+# What does na.rm = TRUE do in mean() and sum()?
+diamonds2 |>  summarise(
+  ymean = mean(y) # not remove, NA will result
+)
+
+diamonds2 |>  summarise(
+  ymean = mean(y, na.rm = T) # now works
+)
+
+diamonds2 |>  summarise(
+  ymean = sum(y) # not removed, NA will result
+)
+
+diamonds2 |>  summarise(
+  ymean = sum(y, na.rm = T) # now works
+)
+
+# Recreate the frequency plot of scheduled_dep_time colored by whether the flight was cancelled or not. Also facet by the cancelled variable. Experiment with different values of the scales variable in the faceting function to mitigate the effect of more non-cancelled flights than cancelled flights.
+
+nycflights13::flights |> 
+  mutate(
+    cancelled = is.na(dep_time)) |> 
+  ggplot(aes(x = sched_dep_time)) + 
+  geom_freqpoly(aes(color = cancelled), binwidth = 5) +
+  facet_wrap(~cancelled, scales = "free_y")
+```
+
+
 
