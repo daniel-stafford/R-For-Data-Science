@@ -2,6 +2,7 @@
 title: "1. Data Visualization"
 output: html_document
 date: "2024-03-10"
+bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -18,6 +19,7 @@ library(ggthemes)
 library(lvplot)
 library(ggrepel)
 library(patchwork)
+library(rvest)
 ```
 
 ```{r 1.2.3 Creating a ggplot}
@@ -44,7 +46,6 @@ ggplot(
   ) +
   scale_color_colorblind()
 ```
-
 
 ```{r exercises}
 dim(penguins) # 344 rows, 8 columns
@@ -282,7 +283,6 @@ ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
 ggsave(filename = "plots/penguin-plot.svg")
 ```
 
-
 ```{r 1.6 exercise}
 ggplot(mpg, aes(x = class)) +
   geom_bar()
@@ -294,8 +294,6 @@ ggsave("plots/mpg-plot.pdf") # saves last run, remember to use f1 for help
 ```{r}
 my_variable <- 10
 my_variable # typo! shouod be my_variable
-
-library(tidyverse)
 
 ggplot(mpg, aes(x = displ, y = hwy)) +
   geom_point() +
@@ -311,7 +309,6 @@ my_scatter_plot <- ggplot(mpg, aes(x = cty, y = hwy)) +
 my_scatter_plot
 ggsave(filename = "plots/mpg-plot.png", plot = my_bar_plot) # my bar plot is saved
 ```
-
 
 ## Ch 3
 
@@ -389,7 +386,6 @@ flights |>
 flights |>
   count(year, month, sort = TRUE)
 ```
-
 
 ```{r 3.2.5 Exercises}
 flights |>
@@ -811,6 +807,7 @@ who2 |>
     values_to = "count"
   )
 ```
+
 ```{r 5.3 Legthening Data}
 df <- tribble(
   ~id, ~bp1, ~bp2,
@@ -950,6 +947,7 @@ diamonds
 ```
 
 ## Ch 7
+
 ```{r 7.2 Reading data from a file}
 students <- read_csv("https://pos.it/r4ds-students-csv")
 glimpse(students)
@@ -1132,6 +1130,7 @@ tribble(
 ```
 
 ## Ch 8
+
 ```{r}
 y <- 1:4
 mean(y)
@@ -1139,7 +1138,7 @@ mean(y)
 dput(mtcars)
 ```
 
-## Ch 9 
+## Ch 9
 
 ```{r 9.2 Aesthetic mappings}
 mpg
@@ -1721,7 +1720,6 @@ nycflights13::flights |>
   facet_wrap(~cancelled, scales = "free_y") # zoom in on y range
 ```
 
-
 ```{r 10.5 Covariation}
 ggplot(diamonds, aes(x = price)) +
   geom_freqpoly(aes(color = cut), binwidth = 500, linewidth = 0.75) # default appearance of geom_freqpoly() is not that useful here because the height, determined by the overall count, differs so much across cuts, making it hard to see the differences in the shapes of their distributions.
@@ -1869,11 +1867,10 @@ nycflights13::flights %>%
 ```
 
 ```{r 10.5.3 Two numerical variables}
-
 ggplot(smaller, aes(x = carat, y = price)) +
   geom_point()
 
-ggplot(smaller, aes(x = carat, y = price)) + 
+ggplot(smaller, aes(x = carat, y = price)) +
   geom_point(alpha = 1 / 100) # using the alpha aesthetic to add transparency.
 
 ggplot(smaller, aes(x = carat, y = price)) +
@@ -1882,40 +1879,35 @@ ggplot(smaller, aes(x = carat, y = price)) +
 ggplot(smaller, aes(x = carat, y = price)) +
   geom_hex()
 
-ggplot(smaller, aes(x = carat, y = price)) + 
+ggplot(smaller, aes(x = carat, y = price)) +
   geom_boxplot(aes(group = cut_width(carat, 0.1)))
-
 ```
 
 ```{r 10.5.3.1 Exercises}
-
 # Instead of summarizing the conditional distribution with a boxplot, you could use a frequency polygon. What do you need to consider when using cut_width() vs. cut_number()? How does that impact a visualization of the 2d distribution of carat and price?
 
 # Visualize the distribution of carat, partitioned by price.
 
 # How does the price distribution of very large diamonds compare to small diamonds? Is it as you expect, or does it surprise you?
- 
+
 # Combine two of the techniques you’ve learned to visualize the combined distribution of cut, carat, and price.
 
 # Two dimensional plots reveal outliers that are not visible in one dimensional plots. For example, some points in the following plot have an unusual combination of x and y values, which makes the points outliers even though their x and y values appear normal when examined separately. Why is a scatterplot a better display than a binned plot for this case?
 
-diamonds |> 
-  filter(x >= 4) |> 
+diamonds |>
+  filter(x >= 4) |>
   ggplot(aes(x = x, y = y)) +
   geom_point() +
   coord_cartesian(xlim = c(4, 11), ylim = c(4, 11))
 
 # Instead of creating boxes of equal width with cut_width(), we could create boxes that contain roughly equal number of points with cut_number(). What are the advantages and disadvantages of this approach?
 
-ggplot(smaller, aes(x = carat, y = price)) + 
+ggplot(smaller, aes(x = carat, y = price)) +
   geom_boxplot(aes(group = cut_number(carat, 20)))
-
-
 ```
 
 ```{r patterns}
-
-install.packages('tidymodels')
+install.packages("tidymodels")
 library(tidymodels)
 
 diamonds <- diamonds |>
@@ -1930,12 +1922,11 @@ diamonds_fit <- linear_reg() |>
 diamonds_aug <- augment(diamonds_fit, new_data = diamonds) |>
   mutate(.resid = exp(.resid))
 
-ggplot(diamonds_aug, aes(x = carat, y = .resid)) + 
+ggplot(diamonds_aug, aes(x = carat, y = .resid)) +
   geom_point()
 
-ggplot(diamonds_aug, aes(x = cut, y = .resid)) + 
+ggplot(diamonds_aug, aes(x = cut, y = .resid)) +
   geom_boxplot()
-
 ```
 
 ## Chapter 11
@@ -1962,18 +1953,17 @@ ggplot(df, aes(x, y)) +
   geom_point() +
   labs(
     x = quote(x[i]),
-    y = quote(sum(x[i] ^ 2, i == 1, n))
+    y = quote(sum(x[i]^2, i == 1, n))
   )
 ```
 
 ```{r 11.2.1 Exercises}
-
 # Create one plot on the fuel economy data with customized title, subtitle, caption, x, y, and color labels.
 names(mpg)
 ?mpg
-mpg |> ggplot(aes(x=displ, y = cty, color=fl)) +
+mpg |> ggplot(aes(x = displ, y = cty, color = fl)) +
   geom_point() +
-    labs(
+  labs(
     x = "Engine displacement (L)",
     y = "City fuel economy (mpg)",
     color = "Fue",
@@ -1981,13 +1971,281 @@ mpg |> ggplot(aes(x=displ, y = cty, color=fl)) +
     subtitle = "Two seaters (sports cars) are an exception because of their light weight",
     caption = "Data from fueleconomy.gov"
   )
-# 
-# Recreate the following plot using the fuel economy data. Note that both the colors and shapes of points vary by type of drive train.
-# 
-# Scatterplot of highway versus city fuel efficiency. Shapes and colors of points are determined by type of drive train.
-# 
-# Take an exploratory graphic that you’ve created in the last month, and add informative titles to make it easier for others to understand.
+```
 
+Label exercises
+```{r}
+mpg |> ggplot(aes(cty, hwy, color = factor(class))) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "blue", se = F) + # color to prevent multiple lines per class
+  labs(
+    x = "MPG in the city",
+    y = "MPG on the highway",
+    color = "Car class",
+    title = "Highway vs. city MPG",
+    subtitle = "SUVs are terrible!"
+  )
+```
+
+Recreate the following plot using the fuel economy data. Note that both the colors and shapes of points vary by type of drive train.
+```{r labels exercise}
+mpg |> ggplot(aes(cty, hwy)) +
+  geom_point(aes(color = factor(drv), shape = factor(drv))) +
+  labs(
+    x = "MPG in the city",
+    y = "MPG on the highway",
+    color = "Type of drive train",
+    shape = "Type of drive train", # identical to avoid two legends
+    title = "Highway vs. city MPG",
+    subtitle = "SUVs are terrible!"
+  )
+```
+
+11.3 Annotations!
+```{r 11.3 annotations}
+label_info <- mpg |>
+  group_by(drv) |>
+  arrange(desc(displ)) |>
+  slice_head(n = 1) |> # pull out the cars with the highest engine size in each drive type
+  mutate(
+    drive_type = case_when(
+      drv == "f" ~ "front-wheel drive",
+      drv == "r" ~ "rear-wheel drive",
+      drv == "4" ~ "4-wheel drive"
+    )
+  ) |>
+  select(displ, hwy, drv, drive_type)
+
+label_info
+
+ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(se = FALSE) +
+  geom_text(
+    data = label_info,
+    aes(x = displ, y = hwy, label = drive_type),
+    fontface = "bold", size = 5, hjust = "right", vjust = "bottom"
+  ) +
+  theme(legend.position = "none")
+#> `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(se = FALSE) +
+  geom_text(
+    data = label_info,
+    aes(x = displ, y = hwy, label = drive_type),
+    fontface = "bold", size = 5, hjust = "right", vjust = "bottom"
+  ) + # hjust (horizontal justification) and vjust (vertical justification) to control the alignment of the label.
+  theme(legend.position = "none")
+
+ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(se = FALSE) +
+  geom_label_repel( #  We can use the geom_label_repel() function from the ggrepel package to address overlap
+    data = label_info,
+    aes(x = displ, y = hwy, label = drive_type),
+    fontface = "bold", size = 5, nudge_y = 2 # Using the fontface and size arguments we can customize the look of the text labels
+  ) +
+  theme(legend.position = "none") # (theme(legend.position = "none") turns all the legends off
+
+potential_outliers <- mpg |>
+  filter(hwy > 40 | (hwy > 20 & displ > 5))
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_text_repel(data = potential_outliers, aes(label = model)) +
+  geom_point(data = potential_outliers, color = "red") + # make outlier points red
+  geom_point(
+    data = potential_outliers,
+    color = "red", size = 3, shape = "circle open"
+  ) # circle around circle
+
+trend_text <- "Larger engine sizes tend to have lower fuel economy." |>
+  str_wrap(width = 30)
+trend_text
+
+# annotation!
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  annotate(
+    geom = "label", x = 3.5, y = 38,
+    label = trend_text,
+    hjust = "left", color = "red"
+  ) +
+  annotate(
+    geom = "segment",
+    x = 3, y = 35, xend = 5, yend = 25, color = "red",
+    arrow = arrow(type = "closed")
+  )
+```
+
+11.3.1 Exercises with Annotations
+Use geom_text() with infinite positions to place text at the four corners of the plot.
+```{r}
+corner_labels <- tibble(
+  x = c(-Inf, -Inf, Inf, Inf),
+  y = c(-Inf, Inf, -Inf, Inf),
+  label = c(
+    "(x0,y0)", "(x0,y1)",
+    "(x1,y0)", "(x1,y1)"
+  ),
+  hjust= c(0, 0, 1, 1),
+  vjust = c(0, 1, 0, 1)
+)
+
+annoation_plot <- mpg |> ggplot(aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_text(data = corner_labels, aes(
+    x = x, y = y, hjust = hjust, vjust = vjust, label = label
+  ))
+annoation_plot
+```
+Use annotate() to add a point geom in the middle of your last plot without having to create a tibble. Customize the shape, size, or color of the point.
+```{r}
+annoation_plot + annotate(
+  geom = "point", x = 4.5, y = 30,
+  color = "pink", size = 15, shape = 15
+)
+```
+
+How do labels with geom_text() interact with faceting? How can you add a label to a single facet? How can you put a different label in each facet? (Hint: Think about the dataset that is being passed to geom_text().)
+```{r}
+label_for_all <- tibble(
+  x = Inf,
+  y = Inf,
+  label = "text for all",
+  vjust = "inward",
+  hjust = "inward",
+  angle = 0,
+  )
+
+mpg |> ggplot(aes(displ, hwy)) +
+  geom_point() +
+  facet_wrap(~ class) + 
+  geom_text(data =label_for_all, aes(label = label, x = x, y = y, vjust = vjust, hjust = hjust, angle = angle  ))
+```
+
+
+Label for a single facet
+```{r}
+label_for_minivan <- tibble(
+  x = Inf,
+  y = Inf,
+  label = "text for minivan",
+  vjust = "inward",
+  hjust = "inward",
+  angle = 0,
+  class = "minivan"
+  )
+
+mpg |> ggplot(aes(displ, hwy)) +
+  geom_point() +
+  facet_wrap(~ class) + 
+  geom_text(data =label_for_minivan, aes(label = label, x = x, y = y, vjust = vjust, hjust = hjust, angle = angle  ))
 
 ```
 
+
+Labels for different facets
+```{r}
+# different facets
+label_different <- mpg |> 
+  group_by(class) |> 
+  summarise(mean_mpg = round(mean(hwy), 1)) |> 
+  mutate(
+    x = Inf,
+    y = Inf,
+    label = paste(class, "average highway mpg:", mean_mpg),
+    vjust = "inward",
+    hjust = "inward",
+    angle = 0
+  )
+
+mpg |> ggplot(aes(displ, hwy)) +
+  geom_point() +
+  facet_wrap(~ class) + 
+  geom_text(data =label_different, aes(label = label, x = x, y = y, vjust = vjust, hjust = hjust, angle = angle))
+```
+
+
+Playing with hjust and vjust
+```{r}
+td <- expand.grid(
+    hjust=c(0, 0.5, 1),
+    vjust=c(0, 0.5, 1),
+    angle=c(0, 45, 90),
+    text="text"
+)
+
+ggplot(td, aes(x=hjust, y=vjust)) + 
+    geom_point() +
+    geom_text(aes(label=text, angle=angle, hjust=hjust, vjust=vjust)) + 
+    facet_grid(~angle) +
+    scale_x_continuous(breaks=c(0, 0.5, 1), expand=c(0, 0.2)) +
+    scale_y_continuous(breaks=c(0, 0.5, 1), expand=c(0, 0.2))
+```
+
+
+```{r}
+corner_labels <- tibble(
+  x = c(-Inf, -Inf, Inf, Inf),
+  y = c(-Inf, Inf, -Inf, Inf),
+  label = c(
+    "(x0,y0)", "(x0,y1)",
+    "(x1,y0)", "(x1,y1)"
+  ),
+  vjust = c(0, 0, 1, 1),
+  hjust = c(0, 1, 0, 1)
+)
+
+annoation_plot <- mpg |> ggplot(aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_text(data = corner_labels, aes(
+    x = x, y = y, hjust = hjust, vjust = vjust, label = label
+  ))
+annoation_plot
+```
+
+What arguments to geom_label() control the appearance of the background box?
+
+What are the four arguments to arrow()? How do they work? Create a series of plots that demonstrate the most important options.
+
+Scales
+```{r 11.4 Scales}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(color = class))
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(color = class)) +
+  scale_x_continuous() +
+  scale_y_continuous() +
+  scale_color_discrete()
+
+ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
+  geom_point() +
+  scale_y_continuous(breaks = seq(15, 40, by = 5))
+
+ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
+  geom_point() +
+  scale_x_continuous(labels = NULL) +
+  scale_y_continuous(labels = NULL) +
+  scale_color_discrete(labels = c("4" = "4-wheel", "f" = "front", "r" = "rear"))
+
+# Left
+ggplot(diamonds, aes(x = price, y = cut)) +
+  geom_boxplot(alpha = 0.05) +
+  scale_x_continuous(labels = label_dollar())
+
+# Right
+ggplot(diamonds, aes(x = price, y = cut)) +
+  geom_boxplot(alpha = 0.05) +
+  scale_x_continuous(
+    labels = label_dollar(scale = 1 / 1000, suffix = "K"),
+    breaks = seq(1000, 19000, by = 6000)
+  )
+
+ggplot(diamonds, aes(x = cut, fill = clarity)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(name = "Percentage", labels = label_percent())
+```

@@ -1,0 +1,12 @@
+---
+title: "Zotero Fiddle"
+output:
+  word_document: default
+  html_document: default
+date: "2024-03-31"
+bibliography: references.bib
+---
+
+This is a zotero reference [@campbell2012].
+
+## References
