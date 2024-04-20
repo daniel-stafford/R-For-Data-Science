@@ -2919,3 +2919,282 @@ flights_holidays <- flights |>
 
 ## 13  Numbers
 
+```{r}
+x <- c("123 4 ABC", "#3")
+parse_number(x)
+```
+
+```{r}
+flights |> count(carrier, sort = T)
+
+flights |> 
+  group_by(carrier) |> 
+  summarise(
+    count = n(),
+    avg_delay = mean(dep_delay, na.rm = T)
+)
+
+flights |> 
+  group_by(dest) |> 
+  summarize(
+    carriers = n_distinct(carrier)
+  ) |>  arrange(desc(carriers))
+
+flights |> 
+  group_by(tailnum) |> 
+  summarize(miles = sum(distance))
+
+flights |>  count(tailnum, wt = distance, name = "miles", sort = T)
+
+flights |> 
+  group_by(dest) |> 
+  summarize(n_cancelled = sum(is.na(dep_time))) |> arrange(desc(n_cancelled))
+```
+
+13.3.1 Exercises
+How can you use count() to count the number rows with a missing value for a given variable?
+```{r}
+flights |> 
+  filter(is.na(tailnum)) |> 
+  count()
+```
+Expand the following calls to count() to instead use group_by(), summarize(), and arrange():
+
+```{r}
+flights |> count(dest, sort = TRUE)
+
+flights |> group_by(dest) |> 
+  summarize(n = n()) |> 
+  arrange(desc(n))
+```
+
+
+```{r}
+flights |> count(tailnum, wt = distance)
+
+flights |> group_by(tailnum) |> 
+  summarise(
+    n = sum(distance)
+  )
+```
+
+13.4 Numeric transformations
+
+What will sum(is.na(x)) tell you? How about mean(is.na(x))?
+
+```{r}
+x <- c(1, 2, NA, 4, NA, 6)
+sum(is.na(x)) # number of missing values
+mean(is.na(x)) # proportion of missing values 1 / 3 
+
+```
+
+
+What does prod() return when applied to a logical vector? What logical summary function is it equivalent to? What does min() return when applied to a logical vector? What logical summary function is it equivalent to? Read the documentation and perform a few experiments.
+
+13.4.8 Exercises
+
+Explain in words what each line of the code used to generate Figure 13.1 does.
+
+```{r}
+flights |> 
+  group_by(hour = sched_dep_time %/% 100) |>  
+  # group by hour, extrat bour 1345 -> 13
+  summarize(prop_cancelled = mean(is.na(dep_time)), n = n()) |>
+  # percnatge of missing dep_times as well as count per hours
+  filter(hour > 1) |>
+  # only flight after 1am (00 is is all missing?)
+  ggplot(aes(x = hour, y = prop_cancelled)) +
+  # plot hoour vs. percentage canceled
+  geom_line(color = "grey50") + 
+  # conct the dots
+  geom_point(aes(size = n))
+  # make plots bigger if more flights at that time
+```
+
+What trigonometric functions does R provide? Guess some names and look up the documentation. Do they use degrees or radians?
+
+sin(x), cos(x) etc. in radians
+
+Currently dep_time and sched_dep_time are convenient to look at, but hard to compute with because they’re not really continuous numbers. You can see the basic problem by running the code below: there’s a gap between each hour.
+
+```{r}
+flights |> 
+  filter(month == 1, day == 1) |> 
+  ggplot(aes(x = sched_dep_time, y = dep_delay)) +
+  geom_point()
+```
+
+Convert them to a more truthful representation of time (either fractional hours or minutes since midnight).
+
+```{r}
+get_minutes_since_midnight <- function(time) {
+  hours <- floor(time / 100)  # Extract the whole number part (hours)
+  minutes <- time %% 100  # Extract the remainder (minutes)
+  minutes_since_midnight <- hours * 60 + minutes  # Convert hours to minutes and add minutes
+  return(minutes_since_midnight)  # Return the result
+}
+
+flights_midnight <- flights |> mutate(
+  dep_time_midnight = get_minutes_since_midnight(dep_time),
+  sched_dep_time_midnight = get_minutes_since_midnight(sched_dep_time)
+)
+
+flights_midnight |> 
+  filter(month == 1, day == 1) |> 
+  ggplot(aes(x = sched_dep_time_midnight, y = dep_time_midnight)) +
+  geom_point()
+```
+
+
+Round dep_time and arr_time to the nearest five minutes.
+
+```{r}
+
+round_to_nearest_5_minutes <- function(time) {
+  hours <- time %/% 100  # Extract the hours
+  minutes <- time %% 100  # Extract the minutes
+  # Round the minutes to the nearest five-minute interval
+  rounded_minutes <- round(minutes / 5) * 5
+  # Adjust hours and minutes if rounding leads to 60 minutes
+  if (rounded_minutes == 60) {
+    hours <- hours + 1
+    rounded_minutes <- 0
+  }
+  # Combine hours and rounded minutes to form the rounded time
+  rounded_time <- hours * 100 + rounded_minutes
+  return(rounded_time)  # Return the rounded time
+}
+
+# Example usage:
+time <- 859  # Example time in HHMM format
+rounded_time <- round_to_nearest_5_minutes(time)
+print(rounded_time)  # Print the rounded time
+```
+
+13.5.4 Exercises
+Find the 10 most delayed flights using a ranking function. How do you want to handle ties? Carefully read the documentation for min_rank().
+
+```{r}
+flights |> mutate(
+  most_delay = min_rank(dep_delay), .before = year) |> arrange(desc(most_delay)) |>  head() |> view()
+```
+
+Which plane (tailnum) has the worst on-time record?
+```{r}
+flights |> 
+  group_by(tailnum) |> 
+  summarise(
+    total_arr_delay = sum(arr_delay, na.rm = T) 
+  ) |> 
+  arrange(desc(total_arr_delay)) # N15910
+```
+
+What time of day should you fly if you want to avoid delays as much as possible?
+
+```{r}
+flights |> 
+  group_by(hour) |> 
+  summarise(
+    total_dep_delay = sum(dep_delay, na.rm = T),
+  ) |> arrange((total_dep_delay)) # Early morning
+```
+
+
+
+What does flights |> group_by(dest) |> filter(row_number() < 4) do? What does flights |> group_by(dest) |> filter(row_number(dep_delay) < 4) do?
+
+```{r}
+flights |> 
+  group_by(dest) |> 
+  filter(row_number() < 4) # keep on first three flights per destination
+```
+
+```{r}
+flights |>
+  group_by(dest) |> 
+  filter(row_number(dep_delay) < 4) |> view()
+# keep first three flights with smallest departure delay per destination 
+```
+
+For each destination, compute the total minutes of delay. For each flight, compute the proportion of the total delay for its destination.
+
+```{r}
+
+flights |> glimpse()
+flights |> 
+  group_by(dest) |> 
+  summarize(
+    total_delay = sum(arr_delay, na.rm = T)
+  )
+
+flights |> 
+  mutate(
+    prop_delay = (dep_delay + arr_delay) / air_time, .before = year
+  )
+```
+
+Delays are typically temporally correlated: even once the problem that caused the initial delay has been resolved, later flights are delayed to allow earlier flights to leave. Using lag(), explore how the average flight delay for an hour is related to the average delay for the previous hour.
+
+```{r}
+flights |> 
+  group_by(hour) |> 
+  summarize(
+    avg_delay = mean(dep_delay, na.rm = TRUE)
+  ) |> 
+  mutate(diff = avg_delay - lag(avg_delay, default = NA)) |> 
+  ggplot(aes(x=diff, y=avg_delay)) + geom_point() + geom_smooth(method='lm')
+```
+
+```{r}
+flights |> 
+  mutate(hour = dep_time %/% 100) |> 
+  group_by(year, month, day, hour) |> 
+  summarize(
+    dep_delay = mean(dep_delay, na.rm = TRUE),
+    n = n(),
+    .groups = "drop"
+  ) |> 
+  filter(n > 5)
+```
+
+Look at each destination. Can you find flights that are suspiciously fast (i.e. flights that represent a potential data entry error)? Compute the air time of a flight relative to the shortest flight to that destination. Which flights were most delayed in the air?
+
+```{r}
+flights |> 
+  group_by(dest) |> 
+  filter(row_number() < 5)
+  arrange(air_time) |> ungroup() |> relocate(air_time) |>  print(n=100)
+  
+flights |> 
+  group_by(dest) |> 
+  filter(row_number(air_time) < 2) |> 
+  ungroup() |> 
+  relocate(air_time, dep_time, arr_time, dest) |> 
+  view()
+ 
+flights |> 
+  group_by(dest) |> 
+  mutate(
+    # get the short flight for each destination
+    shortest_flight = min(air_time, na.rm = T)
+  ) |> ungroup() |> 
+  mutate(
+    # compare each flight to the shortest flight of the destination
+    relative_shortest = air_time / shortest_flight
+  ) |> view()
+  
+```
+
+
+Find all destinations that are flown by at least two carriers. Use those destinations to come up with a relative ranking of the carriers based on their performance for the same destination.
+
+```{r}
+two_carriers  <- flights |> 
+  group_by(dest) |> 
+  mutate(num_carriers = n_distinct(carrier)) |> 
+  filter(num_carriers > 1) 
+   
+  
+```
+
